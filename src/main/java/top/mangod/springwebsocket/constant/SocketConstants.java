@@ -30,7 +30,7 @@ public interface SocketConstants {
 
     interface BizOptModule {
         /**
-         * 视频通话业务
+         * 自定义业务类型
          */
         int TRTC = 1;
     }

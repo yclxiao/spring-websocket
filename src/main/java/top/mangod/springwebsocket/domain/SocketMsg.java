@@ -29,12 +29,12 @@ public class SocketMsg<T> {
     private String roomId;
 
     /**
-     * 业务类型：1家政加  2好到家
+     * 业务类型
      */
     private Integer bizType;
 
     /**
-     * 业务操作模块：1视频通话业务
+     * 业务操作模块
      */
     private Integer bizOptModule;
 
