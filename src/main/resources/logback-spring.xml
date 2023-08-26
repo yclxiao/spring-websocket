@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="false" scanPeriod="60 seconds">
+    <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
+    <contextName>ehome-cloud</contextName>
+    <property scope="context" name="CHARSET" value="utf-8"/>
+    <property scope="context" name="CONSOLE_LOG_PATTERN" value='%d{yyyy-MM-dd HH:mm:ss}|%level|%C\:%M|%L|%thread|"%replace(%.-102400msg){"\n",""}"|"%.-2000ex{5}"%n' />
+
+    <property scope="context" name="appName" value="spring-websocket"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <property scope="context" name="LOG_HOME" value="${user.home}/bmlogs" />
+
+    <!--读取spring配置文件上的属性-->
+    <springProperty scope="context" name="log.level.root" source="log.level.root" />
+
+    <property scope="context" name="ERR_LOG_HOME" value="${LOG_HOME}/err" />
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+    <property scope="context" name="ERR_PATTERN" value='%d{yyyy-MM-dd HH:mm:ss}|%level|%C\:%M|%L|%thread|"%replace(%.-102400msg){"\n",""}"|"%.-2000ex{5}"%n' />
+
+    <property scope="context" name="INFO_LOG_HOME" value="${LOG_HOME}/info" />
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+    <property scope="context" name="INFO_PATTERN" value='%d{yyyy-MM-dd HH:mm:ss}|%level|%C\:%M|%L|%thread|"%replace(%.-102400msg){"\n",""}"|"%.-2000ex{5}"%n' />
+
+    <!-- 应用日志_fileAppender -->
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${INFO_LOG_HOME}/${HOSTNAME}.info.ing</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${INFO_LOG_HOME}/${appName}_info_log.${HOSTNAME}.json.%i.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>50MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>${CHARSET}</charset>
+            <pattern>${INFO_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR日志文件 -->
+    <appender name="ERR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 只记录warn及以上级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <file>${ERR_LOG_HOME}/err.${HOSTNAME}.ing</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名，按天生成文件名 -->
+            <fileNamePattern>${ERR_LOG_HOME}/err.${HOSTNAME}.%d{yyyy-MM-dd}.log.%i.zip</fileNamePattern>
+            <MaxHistory>60</MaxHistory><!--日志文件保留天数 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 按时间回滚的同时，按文件大小来回滚 -->
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>${CHARSET}</charset>
+            <pattern>${ERR_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>1024</queueSize>
+        <discardingThreshold>512</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="ERR_FILE" />
+    </appender>
+    <appender name="ASYNC_INFO_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>1024</queueSize>
+        <discardingThreshold>512</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="INFO_FILE" />
+    </appender>
+
+    <root level="${log.level.root}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_INFO_FILE"/>
+        <appender-ref ref="ASYNC_ERROR_FILE"/>
+    </root>
+
+    <logger name="top.mangod" level="${log.level.root}"/>
+    <!--如有特殊日志的配置加在这里-->
+    <logger name="top.mangod.insurance" level="${log.level.root}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_INFO_FILE"/>
+    </logger>
+    <logger name="org.springframework" level="${log.level.root}"/>
+    <logger name="com.alibaba" level="${log.level.root}"/>
+    <logger name="org.apache" level="${log.level.root}"/>
+</configuration>

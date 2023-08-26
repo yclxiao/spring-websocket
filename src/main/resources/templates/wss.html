@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Example</title>
+  </head>
+  <body>
+    <input type="text" id="sendUserId" />
+    <input type="text" id="receivedUserId" />
+    <input type="text" id="messageInput" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      var socket = new WebSocket("ws://localhost:8080/trtc/websocket/aaa");
+      var roomId = "123456";
+      // 随机产出六位数字
+      var sendUserId = Math.floor(Math.random() * 1000000);
+
+      document.getElementById("sendUserId").value = sendUserId;
+
+
+      socket.onopen = function (event) {
+        console.log("WebSocket is open now.");
+        let loginInfo = {
+          msgType: 2, //登录消息
+          sendUserId: sendUserId,
+          bizType: 1, //业务类型：1家政加 2好到家
+          bizOptModule: 1, //业务模块：1视频面试
+          roomId: roomId,
+          msgBody: {},
+        };
+        socket.send(JSON.stringify(loginInfo));
+      };
+
+      socket.onmessage = function (event) {
+        var message = event.data;
+        console.log("Received message: " + message);
+      };
+
+      socket.onclose = function (event) {
+        console.log("WebSocket is closed now.");
+      };
+
+      function sendMessage() {
+        var message = document.getElementById("messageInput").value;
+        var receivedUserId = document.getElementById("receivedUserId").value;
+        let operateInfo = {
+          msgType: 100, //业务消息
+          sendUserId: sendUserId,
+          bizType: 1, //业务类型：1家政加 2好到家
+          bizOptModule: 1, //业务模块：1视频面试
+          roomId: roomId,
+          receivedUserId: receivedUserId,
+          msgBody: {
+            operateType: 1, //操作类型：禁言
+            operateContent: "1",
+          },
+        };
+        socket.send(JSON.stringify(operateInfo));
+      }
+
+      setInterval(() => {
+        socket.send("ping");
+      }, 1000);
+    </script>
+  </body>
+</html>
