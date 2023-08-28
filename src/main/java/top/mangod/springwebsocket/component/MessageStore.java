@@ -1,6 +1,7 @@
 package top.mangod.springwebsocket.component;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.websocket.Session;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -67,6 +69,13 @@ public class MessageStore {
     public static String getLocalSessionByUser(String userId) {
         String sessionIdKey = userSessionMap.get(getUserIdKey(userId));
         return sessionIdKey;
+    }
+
+    /**
+     * 判断用户的websocket session在本地机器
+     */
+    public static boolean existInLocalServer(String userId) {
+        return userSessionMap.containsKey(getUserIdKey(userId));
     }
 
     /**

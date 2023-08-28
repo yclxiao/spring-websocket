@@ -15,7 +15,7 @@ public class MessageSender {
 
     @Autowired
     private KafkaProducer kafkaProducer;
-    @Value("${kafka.topic.socket.msg}")
+    @Value("${im.message.kafka.socket.topic}")
     private String socketMsgTopic;
     @Autowired
     private MessageStore msgStore;
